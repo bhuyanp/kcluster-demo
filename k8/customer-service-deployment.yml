@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kcluster-customer
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: kcluster-customer
+  template:
+    metadata:
+      labels:
+        app: kcluster-customer
+    spec:
+      containers:
+        - name: kcluster-customer
+          image: kcluster-customer:1.0
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: DATABASE_NAME
+              valueFrom:
+                configMapKeyRef:
+                  # The ConfigMap containing the value you want to assign to SPECIAL_LEVEL_KEY
+                  name: kcluster-config-map
+                  # Specify the key associated with the value
+                  key: mysql_database
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:mysql://mysql:3306/${DATABASE_NAME}?createDatabaseIfNotExist=true&characterEncoding=UTF-8&useUnicode=true&useSSL=false&allowPublicKeyRetrieval=true
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  # The ConfigMap containing the value you want to assign to SPECIAL_LEVEL_KEY
+                  name: kcluster-secrets
+                  # Specify the key associated with the value
+                  key: username
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  # The ConfigMap containing the value you want to assign to SPECIAL_LEVEL_KEY
+                  name: kcluster-secrets
+                  # Specify the key associated with the value
+                  key: password
+          ports:
+            - containerPort: 8080
+---
+apiVersion: v1 # Kubernetes API version
+kind: Service # Kubernetes resource kind we are creating
+metadata: # Metadata of the resource kind we are creating
+  name: kcluster-customer-svc
+spec:
+  selector:
+    app: kcluster-customer
+  ports:
+    - protocol: "TCP"
+      port: 8080 # The port that the service is running on in the cluster
+      targetPort: 8080 # The port exposed by the service
+      nodePort: 30000
+  type: NodePort # type of the service.
