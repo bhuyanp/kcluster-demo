@@ -1,0 +1,10 @@
+apiVersion: v1
+data:
+  mysql_database: customers
+  mysql_test: hello
+kind: ConfigMap
+metadata:
+  creationTimestamp: "2023-12-06T20:06:49Z"
+  name: kcluster-config-map
+  namespace: default
+  resourceVersion: "5108"
