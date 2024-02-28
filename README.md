@@ -81,10 +81,20 @@ kcluster-customer-svc   NodePort    10.109.210.176   <none>        8080:30000/TC
 kubernetes              ClusterIP   10.96.0.1        <none>        443/TCP          29m
 mysql                   ClusterIP   None             <none>        3306/TCP         20m
 ```
-Second port listed for kcluster-customer-svc can be used to connect to the service from ourside the cluster. 
+#### Access the service
+Second port listed for kcluster-customer-svc can be used to connect to the service from outside the cluster. 
 For host/ip use command following command.
+```
+minikube ip
+```
 
-❯ minikube ip
+Alternatively, you can setup a port forwarding using the following command
+```
+kubectl port-forward services/kcluster-customer-svc  8080:8080
+```
+This way you can invoke the service using localhost:8080
+
+#### Check K8s Running Pods
 ```aidl
 kubectl get pods
 ```
